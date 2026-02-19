@@ -15,7 +15,7 @@ app.get("/api/posts", (req, res) => {
 });
 
 app.get("/api/posts/:id", (req, res) => {
-  const achou = Posts.find((p) => p.id === parseInt(req.id));
+  const achou = Posts.find((p) => p.id === parseInt(req.params.id));
   if (!achou) {
     return res.status(404).send("Post não existe");
   }
@@ -45,4 +45,31 @@ app.post("/api/posts", (req, res) => {
   };
   Posts.push(post);
   res.send(post);
+});
+
+app.put("/api/posts/:id", (req, res) => {
+  const achou = Posts.find((p) => p.id === parseInt(req.params.id));
+  if (!achou) {
+    return res.status(404).send("Post não existe");
+  }
+  const result = postsSchema.safeParse(req.body);
+
+  if (!result.success) {
+    return res.status(400).json({
+      message: "Dados inválidos",
+      errors: result.error.flatten().fieldErrors,
+    });
+  }
+  achou.title = req.body.title;
+  res.send(achou);
+});
+
+app.delete("/api/posts/:id", (req, res) => {
+  const achou = Posts.find((p) => p.id === parseInt(req.params.id));
+  if (!achou) {
+    return res.status(404).send("Post não existe");
+  }
+  const index = Posts.indexOf(achou);
+  Posts.splice(index, 1);
+  res.send(achou);
 });
