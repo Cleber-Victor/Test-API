@@ -1,34 +1,34 @@
-import dotenv from "dotenv";
-import path from "path";
-import { fileURLToPath } from "url";
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-dotenv.config({ path: path.resolve(__dirname, "../.env") });
 import express from "express";
-import pkg from "pg";
-const { Pool } = pkg;
+import cors from "cors";
+import dotenv from "dotenv";
+import pool from "./config/db.js";
+
+import userRoutes from "./routes/userRoutes.js";
+import errorHandling from "./middlewares/errorHandler.js";
+
+import createUserTable from "./data/createPostTable.js";
 import { z } from "zod";
 
 const app = express();
-app.use(express.json());
+
 const PORT = 3000;
 
-const pool = new Pool({
-  user: process.env.DB_USER,
-  host: process.env.DB_HOST,
-  database: process.env.DB_NAME,
-  password: String(process.env.DB_PASSWORD),
-  port: parseInt(process.env.DB_PORT || "5432"),
-});
+//Middlewares
+app.use(express.json());
+app.use(cors());
 
-console.log("Banco:", process.env.DB_NAME);
-console.log("Usuário:", process.env.DB_USER);
-try {
-  await pool.connect();
-  console.log("✅ Conectado ao banco usando a Connection String!");
-} catch (err) {
-  console.error("❌ Erro na conexão:", err.message);
-}
+//ROutes
+app.use("/api", userRoutes);
+//Error handling middlware
+app.use;
+
+createUserTable();
+
+//TEsting POSTGRES connection
+app.get("/", async (req, res) => {
+  const result = await pool.query("SELECT current_database()");
+  res.send(`The database name is: ${result.rows[0].current_database}`);
+});
 
 const postsSchema = z.object({
   title: z.string().min(3),
@@ -39,7 +39,7 @@ app.get("/api/posts", async (req, res) => {
   const result = await pool.query("SELECT * FROM posts ORDER BY id ASC");
   res.send(result.rows);
 });
-
+/*
 app.get("/api/posts/:id", async (req, res) => {
   const { id } = req.params;
   const result = await pool.query("SELECT * FROM posts WHERE id = $1", [id]);
@@ -97,7 +97,7 @@ app.delete("/api/posts/:id", async (req, res) => {
   }
   res.send({ message: "Post removido", post: result.rows[0] });
 });
-
+*/
 app.listen(PORT, () => {
   console.log(`🚀 API rodando em http://localhost:${PORT}`);
 });
