@@ -36,7 +36,7 @@ export const getAllPosts = async (req, res, next) => {
 export const getPostById = async (req, res, next) => {
   try {
     const posts = await getPostByIdService(req.params.id);
-    if (!user) return handlerResponse(res, 404, "User not found");
+    if (!posts) return handlerResponse(res, 404, "User not found");
     handlerResponse(res, 200, "post fetched", posts);
   } catch (err) {
     next(err);
@@ -45,8 +45,11 @@ export const getPostById = async (req, res, next) => {
 
 export const updatePost = async (req, res, next) => {
   try {
-    const updatedPost = await updatePostService(req.params.id, title);
-    if (!user) return handlerResponse(res, 404, "User not found");
+    const updatedPost = await updatePostService(
+      req.params.id,
+      req.params.title,
+    );
+    if (!updatedPost) return handlerResponse(res, 404, "User not found");
     handlerResponse(res, 200, "post updated", updatedPost);
   } catch (err) {
     next(err);
@@ -56,7 +59,7 @@ export const updatePost = async (req, res, next) => {
 export const deletePost = async (req, res, next) => {
   try {
     const deletedPost = await deletePostService(req.params.id);
-    if (!user) return handlerResponse(res, 404, "User not found");
+    if (!deletedPost) return handlerResponse(res, 404, "User not found");
     handlerResponse(res, 200, "post deleted", deletedPost);
   } catch (err) {
     next(err);
