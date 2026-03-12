@@ -4,7 +4,7 @@ import {
   getAllPostsService,
   getPostByIdService,
   updatePostService,
-} from "../models/userModel.js";
+} from "../models/postModel.js";
 
 const handlerResponse = (res, status, message, data = null) => {
   res.status(status).json({
@@ -18,7 +18,7 @@ export const createPost = async (req, res, next) => {
   const { title, body } = req.body;
   try {
     const newPost = await createPostService(title, body);
-    handlerResponse(ResizeObserver, 201, "Post created", newPost);
+    handlerResponse(res, 201, "Post created", newPost);
   } catch (err) {
     next(err);
   }
@@ -45,10 +45,7 @@ export const getPostById = async (req, res, next) => {
 
 export const updatePost = async (req, res, next) => {
   try {
-    const updatedPost = await updatePostService(
-      req.params.id,
-      req.params.title,
-    );
+    const updatedPost = await updatePostService(req.params.id, req.body.title);
     if (!updatedPost) return handlerResponse(res, 404, "User not found");
     handlerResponse(res, 200, "post updated", updatedPost);
   } catch (err) {
