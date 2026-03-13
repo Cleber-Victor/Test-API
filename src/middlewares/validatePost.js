@@ -14,10 +14,7 @@ export const validatePost = (req, res, next) => {
       return res.status(400).json({
         status: 400,
         message: "Dados de entrada inválidos",
-        errors: error.errors.map((err) => ({
-          campo: err.path[0],
-          mensagem: err.message,
-        })),
+        errors: error.errors,
       });
     }
     next(error);
